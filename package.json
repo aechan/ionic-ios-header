@@ -1,7 +1,7 @@
 {
-  "name": "ionic-ios-header",
-  "version": "0.0.2",
-  "description": "A Simple Ionic Module that emulates iOS 11 headers",
+  "name": "ionic-ios-headerv4",
+  "version": "0.0.6",
+  "description": "A Simple Ionic Module that emulates iOS 11 headers. Upgraded for Ionic v4.",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "files": [
@@ -15,23 +15,34 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marcelloghiozzi/ionic-ios-header.git"
+    "url": "git+https://github.com/aechan/ionic-ios-header.git"
   },
-  "keywords": ["ionic", "ios", "ios11", "header", "navbar", "toolbar", "searchbar", "11", "angular"],
-  "author": "Marcello Ghiozzi",
+  "keywords": [
+    "ionic",
+    "ios",
+    "ios11",
+    "header",
+    "navbar",
+    "toolbar",
+    "searchbar",
+    "11",
+    "angular"
+  ],
+  "author": "Alec Chan",
   "license": "MIT",
   "devDependencies": {
-    "@angular/common": "5.0.3",
-    "@angular/compiler": "5.0.3",
-    "@angular/compiler-cli": "5.0.3",
-    "@angular/core": "5.0.3",
-    "@angular/forms": "^5.2.7",
-    "@angular/platform-browser": "5.0.3",
-    "@angular/platform-browser-dynamic": "5.0.3",
-    "@types/node": "^9.4.6",
-    "ionic-angular": "3.9.2",
-    "rxjs": "5.5.2",
-    "typescript": "2.4.2",
-    "zone.js": "0.8.18"
+    "@angular/common": "^7.2.2",
+    "@angular/compiler": "~7.2.2",
+    "@angular/compiler-cli": "~7.2.2",
+    "@angular/core": "^7.2.2",
+    "@angular/forms": "^7.2.2",
+    "@angular/platform-browser": "^7.2.2",
+    "@angular/platform-browser-dynamic": "^7.2.2",
+    "@angular/router": "^7.2.15",
+    "@ionic/angular": "^4.0.0",
+    "@types/node": "~10.12.0",
+    "rxjs": "~6.3.3",
+    "typescript": "~3.1.6",
+    "zone.js": "~0.8.29"
   }
 }

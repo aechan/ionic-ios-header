@@ -1,14 +1,14 @@
 import { Component, Input, Output, EventEmitter, TemplateRef, ViewChild, Renderer2, ElementRef } from '@angular/core';
-import { Platform, Content, Toolbar } from 'ionic-angular';
-import { Subscription } from 'rxjs/Subscription';
+import { Platform, IonContent, IonToolbar } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 const HTML_TEMPLATE = `
-<ion-header class="statusbar" #nav>
-  <ion-navbar>
+<ion-header style="box-shadow: none;" class="statusbar" #nav>
+  <ion-toolbar>
     <ng-container *ngTemplateOutlet="navbarStart"></ng-container>
     <ion-title><span #fade>{{title}}</span></ion-title>
     <ng-container *ngTemplateOutlet="navbarEnd"></ng-container>
-  </ion-navbar>
+  </ion-toolbar>
   <ng-container *ngTemplateOutlet="headerEnd"></ng-container>
 </ion-header>
 
@@ -50,12 +50,12 @@ export class HeaderContentComponent {
   @Input() headerEnd: TemplateRef<void>;
 
   //Elements
-  @ViewChild('searchbar') searchbar: Toolbar;
+  @ViewChild('searchbar') searchbar: ElementRef;
   @ViewChild('toolbar') toolbar: ElementRef;
   @ViewChild('nav') nav: ElementRef;
   @ViewChild('fade') fade: ElementRef;
   @ViewChild('header') element: ElementRef;
-  @ViewChild(Content) content: Content;
+  @ViewChild(IonContent) content: IonContent;
 
   //Events
   private subscriptionScroll: Subscription;
@@ -67,7 +67,7 @@ export class HeaderContentComponent {
   private ios: boolean = false;
   private state: boolean = false;
 
-
+  private scrollContent: HTMLElement;
 
   constructor(private renderer: Renderer2, private platform: Platform) {
 
@@ -75,6 +75,7 @@ export class HeaderContentComponent {
 
   //Life cycle
   ngAfterViewInit(){
+    this.content.getScrollElement().then(scroll => this.scrollContent = scroll);
     this.platform.ready().then(() => {
       this.ios = this.platform.is('ios') || this.forceIOS;
       if (this.ios) this.initIOS();
@@ -96,6 +97,7 @@ export class HeaderContentComponent {
     this.contentChange();
     this.subscriptionScroll =  this.content.ionScroll
       .subscribe((data) => {
+        console.log(data);
         if (!this.state && data.scrollTop >= this.element.nativeElement.offsetHeight-5){
           this.state = true;
           this.transitionToHeader()
@@ -112,7 +114,7 @@ export class HeaderContentComponent {
   contentChange(){
     if (this.contentbox){
       this.changes = new MutationObserver((mutations: MutationRecord[]) => {
-        if (this.contentbox.clientHeight < this.content.contentHeight) this.transitionToBody();
+        if (this.contentbox.clientHeight < this.scrollContent.scrollHeight) this.transitionToBody();
       });
       this.changes.observe(this.contentbox, {
         attributes: true,
@@ -138,16 +140,16 @@ export class HeaderContentComponent {
   initAndroid(){
     this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
     this.renderer.setStyle(this.fade.nativeElement, 'opacity', '1');
-    if (this.searchbar) this.renderer.appendChild(this.nav.nativeElement, this.searchbar._elementRef.nativeElement)
+    if (this.searchbar) this.renderer.appendChild(this.nav.nativeElement, this.searchbar.nativeElement)
   }
 
   transitionToHeader(){
     this.renderer.setStyle(this.fade.nativeElement, 'opacity', '1');
-    if (this.searchbar) this.renderer.appendChild(this.nav.nativeElement, this.searchbar._elementRef.nativeElement)
+    if (this.searchbar) this.renderer.appendChild(this.nav.nativeElement, this.searchbar.nativeElement)
   }
 
   transitionToBody(){
-    if (this.searchbar) this.renderer.appendChild(this.toolbar.nativeElement, this.searchbar._elementRef.nativeElement)
+    if (this.searchbar) this.renderer.appendChild(this.toolbar.nativeElement, this.searchbar.nativeElement)
     this.renderer.setStyle(this.fade.nativeElement, 'opacity', '0');
   }
 

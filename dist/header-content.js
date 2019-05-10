@@ -1,7 +1,16 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 import { Component, Input, Output, EventEmitter, TemplateRef, ViewChild, Renderer2, ElementRef } from '@angular/core';
-import { Platform, Content, Toolbar } from 'ionic-angular';
-var HTML_TEMPLATE = "\n<ion-header class=\"statusbar\" #nav>\n  <ion-navbar>\n    <ng-container *ngTemplateOutlet=\"navbarStart\"></ng-container>\n    <ion-title><span #fade>{{title}}</span></ion-title>\n    <ng-container *ngTemplateOutlet=\"navbarEnd\"></ng-container>\n  </ion-navbar>\n  <ng-container *ngTemplateOutlet=\"headerEnd\"></ng-container>\n</ion-header>\n\n<ion-content fullscreen no-bounce>\n  <div #toolbar>\n    <h1 #header class=\"bold-header\">{{title}}</h1>\n    <ion-toolbar [hidden]=\"!search\" #searchbar>\n        <ion-searchbar\n        [(ngModel)]=\"query\"\n        (ionInput)=\"queryChange.emit(query)\">\n      </ion-searchbar>\n    </ion-toolbar>\n  </div>\n  <ng-content></ng-content>\n</ion-content>\n";
-var HeaderContentComponent = (function () {
+import { Platform, IonContent } from '@ionic/angular';
+var HTML_TEMPLATE = "\n<ion-header style=\"box-shadow: none;\" class=\"statusbar\" #nav>\n  <ion-toolbar>\n    <ng-container *ngTemplateOutlet=\"navbarStart\"></ng-container>\n    <ion-title><span #fade>{{title}}</span></ion-title>\n    <ng-container *ngTemplateOutlet=\"navbarEnd\"></ng-container>\n  </ion-toolbar>\n  <ng-container *ngTemplateOutlet=\"headerEnd\"></ng-container>\n</ion-header>\n\n<ion-content fullscreen no-bounce>\n  <div #toolbar>\n    <h1 #header class=\"bold-header\">{{title}}</h1>\n    <ion-toolbar [hidden]=\"!search\" #searchbar>\n        <ion-searchbar\n        [(ngModel)]=\"query\"\n        (ionInput)=\"queryChange.emit(query)\">\n      </ion-searchbar>\n    </ion-toolbar>\n  </div>\n  <ng-content></ng-content>\n</ion-content>\n";
+var HeaderContentComponent = /** @class */ (function () {
     function HeaderContentComponent(renderer, platform) {
         this.renderer = renderer;
         this.platform = platform;
@@ -14,11 +23,9 @@ var HeaderContentComponent = (function () {
         this.state = false;
     }
     //Life cycle
-    //Life cycle
-    HeaderContentComponent.prototype.ngAfterViewInit = 
-    //Life cycle
-    function () {
+    HeaderContentComponent.prototype.ngAfterViewInit = function () {
         var _this = this;
+        this.content.getScrollElement().then(function (scroll) { return _this.scrollContent = scroll; });
         this.platform.ready().then(function () {
             _this.ios = _this.platform.is('ios') || _this.forceIOS;
             if (_this.ios)
@@ -31,10 +38,7 @@ var HeaderContentComponent = (function () {
         this.unsubscribe();
     };
     //Sub Management
-    //Sub Management
-    HeaderContentComponent.prototype.unsubscribe = 
-    //Sub Management
-    function () {
+    HeaderContentComponent.prototype.unsubscribe = function () {
         if (this.subscriptionScroll)
             this.subscriptionScroll.unsubscribe();
         if (this.changes)
@@ -45,6 +49,7 @@ var HeaderContentComponent = (function () {
         this.contentChange();
         this.subscriptionScroll = this.content.ionScroll
             .subscribe(function (data) {
+            console.log(data);
             if (!_this.state && data.scrollTop >= _this.element.nativeElement.offsetHeight - 5) {
                 _this.state = true;
                 _this.transitionToHeader();
@@ -56,14 +61,11 @@ var HeaderContentComponent = (function () {
         });
     };
     //Subscription logic
-    //Subscription logic
-    HeaderContentComponent.prototype.contentChange = 
-    //Subscription logic
-    function () {
+    HeaderContentComponent.prototype.contentChange = function () {
         var _this = this;
         if (this.contentbox) {
             this.changes = new MutationObserver(function (mutations) {
-                if (_this.contentbox.clientHeight < _this.content.contentHeight)
+                if (_this.contentbox.clientHeight < _this.scrollContent.scrollHeight)
                     _this.transitionToBody();
             });
             this.changes.observe(this.contentbox, {
@@ -89,23 +91,20 @@ var HeaderContentComponent = (function () {
         this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
         this.renderer.setStyle(this.fade.nativeElement, 'opacity', '1');
         if (this.searchbar)
-            this.renderer.appendChild(this.nav.nativeElement, this.searchbar._elementRef.nativeElement);
+            this.renderer.appendChild(this.nav.nativeElement, this.searchbar.nativeElement);
     };
     HeaderContentComponent.prototype.transitionToHeader = function () {
         this.renderer.setStyle(this.fade.nativeElement, 'opacity', '1');
         if (this.searchbar)
-            this.renderer.appendChild(this.nav.nativeElement, this.searchbar._elementRef.nativeElement);
+            this.renderer.appendChild(this.nav.nativeElement, this.searchbar.nativeElement);
     };
     HeaderContentComponent.prototype.transitionToBody = function () {
         if (this.searchbar)
-            this.renderer.appendChild(this.toolbar.nativeElement, this.searchbar._elementRef.nativeElement);
+            this.renderer.appendChild(this.toolbar.nativeElement, this.searchbar.nativeElement);
         this.renderer.setStyle(this.fade.nativeElement, 'opacity', '0');
     };
     //Extra
-    //Extra
-    HeaderContentComponent.prototype.debug = 
-    //Extra
-    function () {
+    HeaderContentComponent.prototype.debug = function () {
         console.log('content', JSON.stringify(this.contentbox));
         console.log('element:', this.element);
         console.log('toolbar:', this.toolbar);
@@ -113,38 +112,83 @@ var HeaderContentComponent = (function () {
         console.log('searchbar', this.searchbar);
         console.log('nav', this.nav);
     };
-    HeaderContentComponent.decorators = [
-        { type: Component, args: [{
-                    selector: 'header-content',
-                    template: HTML_TEMPLATE,
-                    styles: ['.bold-header { padding-top: 0px;margin: 0;padding-left: 15px;padding-bottom: 0px;font-size: 2.7em;font-weight: bolder;color: #111}',
-                        '.statusbar{padding-top: calc(20px);padding-top: calc(constant(safe-area-inset-top) + 4px);padding-top: calc(env(safe-area-inset-top));min-height: calc(44px + 20px);min-height: calc(44px + constant(safe-area-inset-top));min-height: calc(44px + env(safe-area-inset-top)); }']
-                },] },
-    ];
-    /** @nocollapse */
-    HeaderContentComponent.ctorParameters = function () { return [
-        { type: Renderer2, },
-        { type: Platform, },
-    ]; };
-    HeaderContentComponent.propDecorators = {
-        "title": [{ type: Input },],
-        "search": [{ type: Input },],
-        "forceIOS": [{ type: Input },],
-        "contentbox": [{ type: Input },],
-        "query": [{ type: Input },],
-        "queryChange": [{ type: Output },],
-        "navbarStart": [{ type: Input },],
-        "navbarEnd": [{ type: Input },],
-        "headerEnd": [{ type: Input },],
-        "searchbar": [{ type: ViewChild, args: ['searchbar',] },],
-        "toolbar": [{ type: ViewChild, args: ['toolbar',] },],
-        "nav": [{ type: ViewChild, args: ['nav',] },],
-        "fade": [{ type: ViewChild, args: ['fade',] },],
-        "element": [{ type: ViewChild, args: ['header',] },],
-        "content": [{ type: ViewChild, args: [Content,] },],
-        "domChange": [{ type: Output },],
-        "appear": [{ type: Output },],
-    };
+    __decorate([
+        Input(),
+        __metadata("design:type", String)
+    ], HeaderContentComponent.prototype, "title", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Boolean)
+    ], HeaderContentComponent.prototype, "search", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Boolean)
+    ], HeaderContentComponent.prototype, "forceIOS", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], HeaderContentComponent.prototype, "contentbox", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", String)
+    ], HeaderContentComponent.prototype, "query", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], HeaderContentComponent.prototype, "queryChange", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", TemplateRef)
+    ], HeaderContentComponent.prototype, "navbarStart", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", TemplateRef)
+    ], HeaderContentComponent.prototype, "navbarEnd", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", TemplateRef)
+    ], HeaderContentComponent.prototype, "headerEnd", void 0);
+    __decorate([
+        ViewChild('searchbar'),
+        __metadata("design:type", ElementRef)
+    ], HeaderContentComponent.prototype, "searchbar", void 0);
+    __decorate([
+        ViewChild('toolbar'),
+        __metadata("design:type", ElementRef)
+    ], HeaderContentComponent.prototype, "toolbar", void 0);
+    __decorate([
+        ViewChild('nav'),
+        __metadata("design:type", ElementRef)
+    ], HeaderContentComponent.prototype, "nav", void 0);
+    __decorate([
+        ViewChild('fade'),
+        __metadata("design:type", ElementRef)
+    ], HeaderContentComponent.prototype, "fade", void 0);
+    __decorate([
+        ViewChild('header'),
+        __metadata("design:type", ElementRef)
+    ], HeaderContentComponent.prototype, "element", void 0);
+    __decorate([
+        ViewChild(IonContent),
+        __metadata("design:type", IonContent)
+    ], HeaderContentComponent.prototype, "content", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", Object)
+    ], HeaderContentComponent.prototype, "domChange", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], HeaderContentComponent.prototype, "appear", void 0);
+    HeaderContentComponent = __decorate([
+        Component({
+            selector: 'header-content',
+            template: HTML_TEMPLATE,
+            styles: ['.bold-header { padding-top: 0px;margin: 0;padding-left: 15px;padding-bottom: 0px;font-size: 2.7em;font-weight: bolder;color: #111}',
+                '.statusbar{padding-top: calc(20px);padding-top: calc(constant(safe-area-inset-top) + 4px);padding-top: calc(env(safe-area-inset-top));min-height: calc(44px + 20px);min-height: calc(44px + constant(safe-area-inset-top));min-height: calc(44px + env(safe-area-inset-top)); }']
+        }),
+        __metadata("design:paramtypes", [Renderer2, Platform])
+    ], HeaderContentComponent);
     return HeaderContentComponent;
 }());
 export { HeaderContentComponent };
